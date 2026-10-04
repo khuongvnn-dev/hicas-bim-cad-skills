@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "hicas-test": {
-      "command": "${LOCALAPPDATA}/Programs/HicasTest/hicastest-mcp.exe"
+      "command": "${LOCALAPPDATA}/Programs/HicasTest/mcp/hicastest-mcp.exe"
     }
   }
 }
