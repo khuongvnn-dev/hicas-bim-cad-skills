@@ -88,6 +88,7 @@ files hasn't changed the facts). Otherwise determine and save:
   "automationBridge": "hicas-test (HicasTest: list_hosts, run_test_case, qa_session_*) | e.g. MCP server '<your-addin-mcp>' (list_revit_instances, call_tool) | none",
   "testBuilds": { "2024": "src/X/bin/Debug/R2024/X.addin", "2026": "src/X/bin/Debug/R2026/X.addin" },
   "testFixtures": "tests/fixtures/ (test/golden .rvt/.dwg only) | none",
+  "desktopTest": "computer-use (Claude runs the B/Critical scripts on the desktop, skill b-desktop-test) | none",
   "automationRule": "e.g. MCP-FEAT-001: new capability needs a tool | none",
   "baseBranch": "DEV", "highRiskPaths": ["**/*.csproj", "..."] }
 ```
@@ -222,6 +223,9 @@ files. Run every build command from Step 0. Must pass before Phase 4.
    Redmine comment **draft**. Knowledge worth keeping → propose a known-issue entry (text only).
    Fill each B script's optional "Tự động hoá" block (host years, fixture, command id, dialog answers) when known;
    for cases run by `b-auto-run`, put the report path(s) in the evidence column and keep the blind-first note.
+   `desktopTest` is `computer-use` and not in an addin-batch lane → after the full build + tests pass, run the
+   `b-desktop-test` skill for this story's B / Critical scripts (it asks the user once before taking the desktop).
+   In a lane, leave it to addin-batch (one desktop for all lanes).
 6. Shut down teammates. Report in Vietnamese (≤ 15 lines): counts **A Pass / B chờ / Critical / Fail**, eval
    verdicts, files changed, what the user must do next, open risks. Inside an addin-batch lane
    (`.harness/lane.json` exists) do not commit: addin-batch `sync` commits on the lane branch and merges it into the
@@ -235,5 +239,5 @@ files. Run every build command from Step 0. Must pass before Phase 4.
 | 1 | Phase 1 (only if conflicts) | Answer ≤ 5 closed questions |
 | 2 | Gate (skipped for low risk with `auto`) | Approve plan + branch |
 | 3 | Phase 5 (only after 3 FAILs) | Decide: change design / ticket / accept |
-| 4 | Handover | Run level-B / Critical scripts (blind, before reading machine reports), then ask for commit |
+| 4 | Handover | Run level-B / Critical scripts (blind, before reading machine reports), then ask for commit. With `desktopTest: computer-use`: allow Claude to take the desktop once, then confirm its evidence (visual items, [Critical]) |
 Everything else (lint, scan, design check, test-first, build/test, review, evaluation, handover docs) is automatic.

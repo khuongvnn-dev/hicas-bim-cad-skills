@@ -24,6 +24,7 @@ Redmine ──► redmine-us-writer-verified ──► ticket .md (có Hợp đ�
 | [`addin-story`](skills/addin-story/SKILL.md) | Team-lead playbook cho 1 ticket/US: test-first, maker ≠ checker, evaluator độc lập | `/hicas-bimcad:addin-story <file.md> [auto\|resume]` |
 | [`b-auto-run`](skills/b-auto-run/SKILL.md) | Chạy tự động các case cấp B trong Revit/AutoCAD thật bằng HicasTest, trên mọi năm deploy đã cài; gắn báo cáo máy vào `qa-handover.md`, ghi ledger. Không bao giờ ghi Pass | Từ addin-story Phase 5.4 / addin-batch khi `automationBridge` = `hicas-test`, hoặc `/hicas-bimcad:b-auto-run` |
 | [`qa-test-session`](skills/qa-test-session/SKILL.md) | QA mô tả bằng lời, Claude điều khiển Revit/AutoCAD từng bước, chụp ảnh mỗi bước, xuất báo cáo | Tự kích hoạt khi QA nhờ test một tính năng, hoặc `/hicas-bimcad:qa-test-session` |
+| [`b-desktop-test`](skills/b-desktop-test/SKILL.md) | Sau khi story code + unit test xong, Claude **tự lấy quyền điều khiển máy** (computer-use) chạy các kịch bản test tay B / Critical trong `qa-handover.md` trên bản copy fixture, chụp ảnh từng bước, ghi bằng chứng. Chỉ điều khiển Revit/AutoCAD, dừng ở màn đăng nhập/license/hộp thoại lạ, không bao giờ ghi Pass | Từ addin-story Phase 6 / addin-batch `finish` khi `desktopTest` = `computer-use`, hoặc `/hicas-bimcad:b-desktop-test` |
 
 Subagent đi kèm (`hicas-bimcad:<tên>`): `addin-scout`, `addin-implementer`, `addin-helper-writer`,
 `addin-wpf-ui`, `addin-reviewer`, `explorer`, `test-writer`, `architect-reviewer`, `evaluator`.
