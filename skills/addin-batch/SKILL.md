@@ -3,7 +3,7 @@ name: addin-batch
 description: Coordinator for several Redmine tickets at once in a Revit/AutoCAD add-in repo. Pulls the dev's open tickets from Redmine, groups Task/Implement/Bug under their User Story (or Change request/Enhancement), writes one ticket .md per ticket with redmine-us-writer-verified, plans each US (addin-story Phase 0–2), detects cross-story conflicts, asks ONE batch gate, then runs each approved US in its own sibling git worktree with addin-story on a lane branch cut from the batch's integration branch (<user>_<yyyyMMdd>), drives the level-B test queue, merges finished lanes into the integration branch, and prepares one MR description for the user. Never writes protected branches, never pushes. Run only when the user explicitly invokes addin-batch; never start it on your own.
 metadata:
   author: Hicas BIM/CAD
-  version: "1.2.0"
+  version: "1.2.1"
   usage: "addin-batch plan [ticket ids] | launch [lane ids] | status | sync <lane id> | finish | clean [lane id|all]"
   preferred-model: opus
 ---
@@ -60,15 +60,29 @@ Lane = one US-level ticket (with all its children) **or** one standalone bug. La
     "workTrackers": ["Implement","Task"], "bugTrackers": ["Bug","Defect(GapBA)"],
     "skipTrackers": ["Test","UI Design","Epic", "..."] },
   "lanes": { "maxParallel": 2, "worktreeRoot": "<parent folder of the repo>",
-    "branchUser": "<user, e.g. longpl>",
+    "branchUser": "<from git user.name of this machine — see below; never copied from another machine>",
     "integrationBranchPattern": "{user}_{date}", "branchPattern": "{integration}_lane{ID}",
     "protectedBranches": ["DEV", "UAT", "release*", "main", "master"], "push": false,
     "defaultBase": "DEV", "askBaseWhenVersionMatches": ["[Hotfix]"] },
   "hotFiles": ["**/*.csproj", "..."] }
 ```
-Branches: `{date}` = `yyyyMMdd` of the batch start; a second batch on the same day gets `-2`, `-3`…
-(e.g. integration `longpl_20261004`, lanes `longpl_20261004_lane1234`). Old configs with
-`branchPattern: "<user>_lane{ID}"` and no `integrationBranchPattern` → ask the user once to upgrade the config.
+Branches: `{user}` = `lanes.branchUser`; `{date}` = `yyyyMMdd` of the batch start; a second batch on the same day
+gets `-2`, `-3`… (e.g. for git user.name `longpl`: integration `longpl_20261004`, lanes `longpl_20261004_lane1234`;
+for `Lê Phi Long`: `lephilong_20261004`).
+
+**`branchUser` — set on the first run on each machine, before any branch is created:**
+1. Run `node "<skill dir>/scripts/branch-user.mjs"` in the main checkout. It reads `git config user.name` (repo, then
+   global), removes Vietnamese diacritics, keeps `[a-z0-9.-]`, checks it with `git check-ref-format`, and prints
+   `{"gitUserName": "...", "branchUser": "..."}`.
+2. Show the user both values and the resulting example branch `<branchUser>_<today>` and confirm in the same
+   question round as the rest of the config (default = the computed value; the user may type another).
+   Exit 1 (no user.name, or nothing usable) → ask the user for a name; suggest `git config --global user.name`.
+3. Save it in `lanes.branchUser`. On later runs, if `branchUser` is missing, still a `<…>` placeholder, or the
+   current `git config user.name` maps to a different value (another person / machine using a copied config),
+   repeat steps 1–2 before creating any branch.
+
+Old configs with `branchPattern: "<user>_lane{ID}"` and no `integrationBranchPattern` → ask the user once to upgrade
+the config (and set `branchUser` as above).
 Discover tracker/status/category ids with `GET /trackers.json`, `/issue_statuses.json`,
 `/projects/<id>/issue_categories.json`; never guess them. Status ids = statuses where the **dev** still has work
 (e.g. New, In Progress, Failed) — not Ready For QA / QA testing / QA Verified / Resolved.

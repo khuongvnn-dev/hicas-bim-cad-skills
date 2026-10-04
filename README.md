@@ -55,7 +55,9 @@ vẫn cần người xác nhận.
 
 ## Nhánh và bảo vệ nhánh (addin-batch)
 
-Mỗi đợt làm việc có **một nhánh tích hợp** riêng của người dùng, agent chỉ ghi trên nhánh của đợt:
+Mỗi đợt làm việc có **một nhánh tích hợp** riêng của người dùng, agent chỉ ghi trên nhánh của đợt. Tiền tố là
+`lanes.branchUser`, lấy từ `git config user.name` của **từng máy** ở lần chạy đầu (bỏ dấu, chữ thường — vd
+`Lê Phi Long` → `lephilong`) và hỏi xác nhận một lần; `longpl` dưới đây chỉ là ví dụ:
 
 ```
 DEV ──●──────────────────────────────────────── (agent không ghi)

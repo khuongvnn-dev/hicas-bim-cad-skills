@@ -5,7 +5,7 @@
 .DESCRIPTION
   Create:
     - Worktree at <Root>\<repoName>-wt-<Id> (sibling of the repo, so relative HintPaths like ..\..\Lib still resolve).
-    - Branch <Branch> from <Base> (or reuse the branch if it already exists).
+    - Branch <Branch> (required; from addin-batch lanes.branchUser) from <Base> (or reuse the branch if it already exists).
     - packages\ as a directory junction to the main repo's packages\ (no 450 MB copy). Use -CopyPackages to copy instead.
     - Copies harness context: .harness\config.json, addin-story.json, project-map.md, tickets\, features\<each id>.
     - Writes .harness\lane.json (lane id, ticket ids, base, branch, base commit, main repo path).
@@ -17,7 +17,7 @@
     - Never deletes the branch.
 
 .EXAMPLE
-  powershell -ExecutionPolicy Bypass -File new-worktree.ps1 -Id 40236 -Ids 40236,42033,42066 -Base DEV
+  powershell -ExecutionPolicy Bypass -File new-worktree.ps1 -Id 40236 -Ids 40236,42033,42066 -Base longpl_20261004 -Branch longpl_20261004_lane40236
   powershell -ExecutionPolicy Bypass -File new-worktree.ps1 -Id 40236 -Remove
 #>
 [CmdletBinding()]
@@ -102,11 +102,11 @@ if ($Remove) {
 
 # ---------------------------------------------------------------- create
 if (Test-Path $wt) { Fail "Path already exists: $wt" }
-if (-not $Branch) {
-  $user = (& git -C $Repo config user.name)
-  if (-not $user) { $user = 'dev' }
-  $Branch = "$($user)_lane$Id"
-}
+# Branch names come from addin-batch (lanes.branchUser, derived from git user.name by scripts/branch-user.mjs);
+# never build them from the raw user.name here (spaces / Vietnamese diacritics are not valid in refs).
+if (-not $Branch) { Fail 'Pass -Branch (addin-batch computes it from lanes.branchUser, e.g. longpl_20261004_lane1234).' }
+& git check-ref-format --branch $Branch | Out-Null
+if ($LASTEXITCODE -ne 0) { Fail "Invalid branch name: $Branch" }
 
 & git -C $Repo rev-parse --verify --quiet "$Base^{commit}" | Out-Null
 if ($LASTEXITCODE -ne 0) { Fail "Base '$Base' does not exist." }

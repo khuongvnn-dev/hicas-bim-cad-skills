@@ -43,7 +43,7 @@
   "lanes": {
     "maxParallel": 2,
     "worktreeRoot": "<thư mục cha của repo, vd C:\\src>",
-    "branchUser": "<user, vd longpl>",
+    "branchUser": "<tự lấy từ git user.name của máy ở lần chạy đầu (scripts/branch-user.mjs), vd longpl>",
     "integrationBranchPattern": "{user}_{date}",
     "branchPattern": "{integration}_lane{ID}",
     "protectedBranches": [
