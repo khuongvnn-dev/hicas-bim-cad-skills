@@ -78,10 +78,13 @@ Script [`setup-ag-ide.ps1`](setup-ag-ide.ps1) giúp tự động thiết lập t
    Không commit API key. `REDMINE_READ_ONLY` mặc định `1`; đặt `0` chỉ khi thật sự cần ghi lên Redmine.
 3. Trong Claude Code:
    ```
-   /plugin marketplace add D:\hicas-skills
+   /plugin marketplace add longpl-1902/hicas-bim-cad-skills
    /plugin install hicas-bimcad@hicas-skills
    ```
-   (hoặc trỏ tới repo git nội bộ khi đã đẩy lên).
+   Tên marketplace là `hicas-skills` (lấy từ `.claude-plugin/marketplace.json`, không phải tên repo).
+   Cập nhật bản mới: `/plugin marketplace update hicas-skills`.
+   Khi đang sửa skill trên máy, có thể trỏ marketplace vào thư mục clone thay cho GitHub:
+   `/plugin marketplace add <đường dẫn clone>`.
 
 ## Nhánh và bảo vệ nhánh (addin-batch)
 
