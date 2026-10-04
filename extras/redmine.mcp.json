@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "redmine": {
+      "command": "uvx",
+      "args": ["--from", "mcp-redmine==2026.08.01.002543", "mcp-redmine"],
+      "env": {
+        "REDMINE_URL": "${REDMINE_URL}",
+        "REDMINE_API_KEY": "${REDMINE_API_KEY}",
+        "REDMINE_READ_ONLY": "${REDMINE_READ_ONLY:-1}"
+      }
+    }
+  }
+}

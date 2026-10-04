@@ -1,0 +1,48 @@
+{
+  "name": "hicas-skills",
+  "owner": {
+    "name": "Hicas BIM/CAD"
+  },
+  "metadata": {
+    "description": "Hicas skills cho add-in Revit/AutoCAD: từ ticket Redmine tới code đã kiểm chứng độc lập",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "hicas-bimcad",
+      "description": "Quy trình từ thu thập yêu cầu tới hiện thực hóa cho add-in Revit/AutoCAD (C#, .NET Framework 4.8): đọc ticket Redmine thành tài liệu có Hợp đồng kiểm thử (redmine-us-writer-verified), điều phối nhiều ticket theo US trên git worktree (addin-batch), và team-lead playbook test-first + thẩm định độc lập (addin-story), kèm các subagent. Cần MCP server tên redmine (vd plugin harness-redmine, hoặc extras/redmine.mcp.json).",
+      "version": "1.0.0",
+      "author": {
+        "name": "Hicas BIM/CAD"
+      },
+      "source": "./",
+      "strict": false,
+      "keywords": [
+        "revit",
+        "autocad",
+        "bim",
+        "cad",
+        "redmine",
+        "workflow",
+        "worktree",
+        "tdd"
+      ],
+      "skills": [
+        "./skills/redmine-us-writer-verified",
+        "./skills/addin-batch",
+        "./skills/addin-story"
+      ],
+      "agents": [
+        "./agents/addin-scout.md",
+        "./agents/addin-implementer.md",
+        "./agents/addin-helper-writer.md",
+        "./agents/addin-wpf-ui.md",
+        "./agents/addin-reviewer.md",
+        "./agents/explorer.md",
+        "./agents/test-writer.md",
+        "./agents/architect-reviewer.md",
+        "./agents/evaluator.md"
+      ]
+    }
+  ]
+}

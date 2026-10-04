@@ -1,0 +1,62 @@
+{
+  "redmine": {
+    "baseUrl": "https://<redmine-host>",
+    "projectIds": [
+      0
+    ],
+    "categoryIds": [
+      0
+    ],
+    "categoryNames": [
+      "<category của repo add-in này>"
+    ],
+    "assignedTo": "me",
+    "statusIds": [
+      1,
+      2,
+      4
+    ],
+    "statusNames": [
+      "New",
+      "In Progress",
+      "Failed"
+    ],
+    "storyTrackers": [
+      "User Story",
+      "Change request",
+      "Enhancement/Improvement"
+    ],
+    "workTrackers": [
+      "Implement",
+      "Task"
+    ],
+    "bugTrackers": [
+      "Bug",
+      "Defect(GapBA)"
+    ],
+    "skipTrackers": [
+      "Test",
+      "UI Design",
+      "Epic"
+    ]
+  },
+  "lanes": {
+    "maxParallel": 2,
+    "worktreeRoot": "<thư mục cha của repo, vd C:\\src>",
+    "branchPattern": "<user>_lane{ID}",
+    "defaultBase": "DEV",
+    "askBaseWhenVersionMatches": [
+      "[Hotfix]"
+    ]
+  },
+  "hotFiles": [
+    "**/*.csproj",
+    "<App>/Application/<Ribbon>Application.cs",
+    "<App>.Mcp/**",
+    "docs/reference/known-issues.md",
+    "**/Properties/AssemblyInfo.cs",
+    "CICD/**",
+    "**/*.addin"
+  ],
+  "_comment": "Copy vào <repo>/.harness/addin-batch.json rồi thay các giá trị <...>. Lấy id thật bằng GET /trackers.json, /issue_statuses.json, /projects/<id>/issue_categories.json — không đoán."
+}
