@@ -43,7 +43,17 @@
   "lanes": {
     "maxParallel": 2,
     "worktreeRoot": "<thư mục cha của repo, vd C:\\src>",
-    "branchPattern": "<user>_lane{ID}",
+    "branchUser": "<user, vd longpl>",
+    "integrationBranchPattern": "{user}_{date}",
+    "branchPattern": "{integration}_lane{ID}",
+    "protectedBranches": [
+      "DEV",
+      "UAT",
+      "release*",
+      "main",
+      "master"
+    ],
+    "push": false,
     "defaultBase": "DEV",
     "askBaseWhenVersionMatches": [
       "[Hotfix]"

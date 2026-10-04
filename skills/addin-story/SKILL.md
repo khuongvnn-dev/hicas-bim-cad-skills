@@ -223,7 +223,9 @@ files. Run every build command from Step 0. Must pass before Phase 4.
    Fill each B script's optional "Tự động hoá" block (host years, fixture, command id, dialog answers) when known;
    for cases run by `b-auto-run`, put the report path(s) in the evidence column and keep the blind-first note.
 6. Shut down teammates. Report in Vietnamese (≤ 15 lines): counts **A Pass / B chờ / Critical / Fail**, eval
-   verdicts, files changed, what the user must do next, open risks. Do not commit unless asked; when asked:
+   verdicts, files changed, what the user must do next, open risks. Inside an addin-batch lane
+   (`.harness/lane.json` exists) do not commit: addin-batch `sync` commits on the lane branch and merges it into the
+   batch integration branch. Standalone: do not commit unless asked; when asked:
    one commit for the whole story, never stage `.harness/` or `.claude/`, message
    `<type>(<scope>): <summary> [refs #<ID>]` + rule IDs checked, follow the user's/project's commit conventions.
 

@@ -53,6 +53,26 @@ vẫn cần người xác nhận.
    ```
    (hoặc trỏ tới repo git nội bộ khi đã đẩy lên).
 
+## Nhánh và bảo vệ nhánh (addin-batch)
+
+Mỗi đợt làm việc có **một nhánh tích hợp** riêng của người dùng, agent chỉ ghi trên nhánh của đợt:
+
+```
+DEV ──●──────────────────────────────────────── (agent không ghi)
+       \
+        longpl_20261004 ──●───M(1234)───M(1240)───M(DEV)──► người tự push + mở MR vào DEV
+                           \  /         /
+                 longpl_20261004_lane1234  longpl_20261004_lane1240   (mỗi US một worktree)
+```
+
+- Agent tự tạo nhánh/worktree, commit trên nhánh lane, merge `--no-ff` lane vào nhánh tích hợp (mỗi US một merge
+  commit — gỡ một US bằng `git revert -m 1 <merge>`), cuối đợt merge DEV mới nhất **vào** nhánh tích hợp và soạn
+  `.harness/batch/mr-<nhánh>.md`.
+- **Không push** (`lanes.push: false`); người tự push và mở MR. Redmine vẫn chỉ đọc, comment là bản nháp.
+- Hook [`hooks/guard-git.mjs`](hooks/guard-git.mjs) (cài cùng plugin, cần Node.js) chặn mọi lệnh git ghi vào
+  `lanes.protectedBranches` (mặc định `DEV, UAT, release*, main, master`) và mọi `git push`. Hook **chỉ có hiệu lực**
+  trong repo có `.harness/addin-batch.json`; repo khác không bị ảnh hưởng. Nên bật thêm branch protection trên server Git.
+
 ## Dữ liệu trong repo dự án
 
 Các skill ghi file quy trình vào thư mục `.harness/` của repo dự án (phải nằm trong `.git/info/exclude`,
