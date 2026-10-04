@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "hicas-bimcad",
-      "description": "Quy trình từ thu thập yêu cầu tới hiện thực hóa cho add-in Revit/AutoCAD (C#, .NET Framework 4.8): đọc ticket Redmine thành tài liệu có Hợp đồng kiểm thử (redmine-us-writer-verified), điều phối nhiều ticket theo US trên git worktree (addin-batch), và team-lead playbook test-first + thẩm định độc lập (addin-story), kèm các subagent. Cần MCP server tên redmine (vd plugin harness-redmine, hoặc extras/redmine.mcp.json).",
+      "description": "Quy trình từ thu thập yêu cầu tới hiện thực hóa cho add-in Revit/AutoCAD (C#, .NET Framework 4.8): đọc ticket Redmine thành tài liệu có Hợp đồng kiểm thử (redmine-us-writer-verified), điều phối nhiều ticket theo US trên git worktree (addin-batch), và team-lead playbook test-first + thẩm định độc lập (addin-story), kèm các subagent; test cấp B tự động và phiên test có ảnh cho QA qua HicasTest (b-auto-run, qa-test-session). Cần MCP server tên redmine (vd plugin harness-redmine, hoặc extras/redmine.mcp.json).",
       "version": "1.0.0",
       "author": {
         "name": "Hicas BIM/CAD"
@@ -30,7 +30,9 @@
       "skills": [
         "./skills/redmine-us-writer-verified",
         "./skills/addin-batch",
-        "./skills/addin-story"
+        "./skills/addin-story",
+        "./skills/b-auto-run",
+        "./skills/qa-test-session"
       ],
       "agents": [
         "./agents/addin-scout.md",

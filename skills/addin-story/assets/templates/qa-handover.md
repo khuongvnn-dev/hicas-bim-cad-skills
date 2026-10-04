@@ -16,6 +16,10 @@ updated: <YYYY-MM-DD>
 |---|---|---|---|---|---|
 > Trạng thái chỉ được là: Pass có bằng chứng · Fail · Chờ xác nhận · Chưa chạy được (lý do).
 > Cấp B và [Critical] không bao giờ là Pass khi chưa có người xác nhận.
+> Bằng chứng máy (HicasTest, nếu có): `MATCH / MISMATCH / NOT-RUN / ERROR` chỉ là bằng chứng, không phải Pass;
+> trạng thái tối đa là "Chờ xác nhận — có bằng chứng máy".
+> Trong giai đoạn đo độ chính xác: **chạy kịch bản tay trước**, ghi kết quả, rồi mới mở báo cáo máy;
+> điền `human_verdict` / `disagreement_cause` vào `b-auto-ledger.csv`.
 
 ## Kịch bản test tay cho case cấp B / [Critical]
 ### AC-xx — <tên>
@@ -24,6 +28,13 @@ updated: <YYYY-MM-DD>
 3. Kỳ vọng: <giá trị + đơn vị + dung sai> (nguồn: …)
 4. Bằng chứng cần thu: <ảnh / bảng dump / file log + đường dẫn lưu>
 5. Ghi kết quả: Pass / Fail + người + ngày
+6. Báo cáo máy: <đường dẫn report-*.md theo từng năm host, hoặc "chưa chạy">
+
+Tự động hoá (tuỳ chọn — để b-auto-run khỏi phải đoán):
+- Host/năm: <Revit 2024, 2026 | AutoCAD 2025>
+- Fixture: <tests/fixtures/... .rvt/.dwg — chỉ file test/golden>
+- Lệnh: <CustomCtrl_%CustomCtrl_%Tab%Panel%Nút | lệnh AutoCAD + giá trị trả lời prompt>
+- Hộp thoại: <"tiêu đề" → nút, …>
 
 ## Thay đổi theo yêu cầu
 | R | File | Nội dung |

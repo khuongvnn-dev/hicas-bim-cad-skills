@@ -85,7 +85,9 @@ files hasn't changed the facts). Otherwise determine and save:
   "build": ["msbuild X.sln /p:Configuration=Debug /m /v:m", "msbuild X_R2022.sln ..."],
   "test": "vstest.console ... | dotnet test ...", "testLimits": "e.g. XYZ not constructible outside host",
   "twinProjects": "rule: new .cs → both X.csproj and X_R2022.csproj",
-  "automationBridge": "e.g. MCP server '<your-addin-mcp>' (list_revit_instances, call_tool) | none",
+  "automationBridge": "hicas-test (HicasTest: list_hosts, run_test_case, qa_session_*) | e.g. MCP server '<your-addin-mcp>' (list_revit_instances, call_tool) | none",
+  "testBuilds": { "2024": "src/X/bin/Debug/R2024/X.addin", "2026": "src/X/bin/Debug/R2026/X.addin" },
+  "testFixtures": "tests/fixtures/ (test/golden .rvt/.dwg only) | none",
   "automationRule": "e.g. MCP-FEAT-001: new capability needs a tool | none",
   "baseBranch": "DEV", "highRiskPaths": ["**/*.csproj", "..."] }
 ```
@@ -200,11 +202,15 @@ files. Run every build command from Step 0. Must pass before Phase 4.
      PASS-WITH-NOTES if any 1; PASS if all 2. Write `F/eval-T<n>-<k>.md` in the eval format of *File layout* (front-matter
      `verdict`, `human_agrees:` empty), log it.
    - FAIL → fix → **new** evaluator (max 3 rounds, then stop and report to the user). PASS → task `ready-to-push`.
-4. **Level-B machine evidence (optional, saves the user time):** if `automationBridge` exists and the user has a
-   **test/golden** model or DWG open, use **read-only** tools to dump the values a B case needs into
-   `evidence/T<n>/<case>-host.txt`. WRITE tools only on a test model with preview/dry-run and the user's OK.
-   The case stays "Chờ xác nhận — có bằng chứng máy"; a human still confirms. Never touch customer models
-   without explicit permission.
+4. **Level-B machine evidence (optional, saves the user time):**
+   - `automationBridge` is `hicas-test` → run the `b-auto-run` skill for this story: YAML in `F/b-cases/`,
+     evidence in `F/evidence/host/<year>/`, ledger `F/b-auto-ledger.csv`, one run per `deployVersions` year that
+     is installed and has a `testBuilds` entry. The tool opens only `testFixtures`, always on a copy.
+   - Another bridge (an add-in's own MCP) and the user has a **test/golden** model or DWG open → use **read-only**
+     tools to dump the values a B case needs into `evidence/T<n>/<case>-host.txt`. WRITE tools only on a test
+     model with preview/dry-run and the user's OK.
+   Either way the case stays "Chờ xác nhận — có bằng chứng máy" at best; a human still confirms. Tool verdicts
+   (`MATCH/MISMATCH/NOT-RUN/ERROR`) are never written as Pass. Never touch customer models without explicit permission.
 
 ## Phase 6 — Integrate & hand over
 1. Project-file entries in all twins, command/ribbon/manifest registration (`.addin` / `PackageContents.xml`).
@@ -214,6 +220,8 @@ files. Run every build command from Step 0. Must pass before Phase 4.
 5. `F/qa-handover.md` from template: per-case table (writer format), step-by-step scripts for every B / Critical
    case (model/DWG, button/command, inputs, expected value + unit + tolerance + source, evidence to capture),
    Redmine comment **draft**. Knowledge worth keeping → propose a known-issue entry (text only).
+   Fill each B script's optional "Tự động hoá" block (host years, fixture, command id, dialog answers) when known;
+   for cases run by `b-auto-run`, put the report path(s) in the evidence column and keep the blind-first note.
 6. Shut down teammates. Report in Vietnamese (≤ 15 lines): counts **A Pass / B chờ / Critical / Fail**, eval
    verdicts, files changed, what the user must do next, open risks. Do not commit unless asked; when asked:
    one commit for the whole story, never stage `.harness/` or `.claude/`, message
@@ -225,5 +233,5 @@ files. Run every build command from Step 0. Must pass before Phase 4.
 | 1 | Phase 1 (only if conflicts) | Answer ≤ 5 closed questions |
 | 2 | Gate (skipped for low risk with `auto`) | Approve plan + branch |
 | 3 | Phase 5 (only after 3 FAILs) | Decide: change design / ticket / accept |
-| 4 | Handover | Run level-B / Critical scripts, then ask for commit |
+| 4 | Handover | Run level-B / Critical scripts (blind, before reading machine reports), then ask for commit |
 Everything else (lint, scan, design check, test-first, build/test, review, evaluation, handover docs) is automatic.

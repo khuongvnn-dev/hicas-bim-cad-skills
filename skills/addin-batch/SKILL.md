@@ -142,7 +142,12 @@ Print one table: `Lane | state | task tiến độ | eval | B chờ | drift | vi
 A lane whose `qa-handover.md` exists → state `b-test`, append it to `b-queue.md`.
 
 ## Level-B queue (`b-queue.md`)
-Revit/AutoCAD testing stays human and sequential. For the head of the queue tell the user exactly:
+If `automationBridge` is `hicas-test`, first run `b-auto-run` for every lane in `b-test` state, one lane at a time
+(each run uses a fresh host process with that lane's build, so lanes never share a host). Add a column `máy` to
+`b-queue.md` (`MATCH n / MISMATCH n / NOT-RUN n`) and move lanes with MISMATCH or ERROR to the front of the human
+queue. Machine results never close a case.
+
+Confirmation by a human stays sequential. For the head of the queue tell the user exactly:
 the worktree path, the DLL to load (`<worktree>/<project>/bin/Debug/…dll`, via Add-in Manager or the project's
 usual dev load method — never overwrite an installed product folder without asking), the model/DWG, and the lane's
 `qa-handover.md` scripts. One lane per host process; close it before loading another lane's build of the same
