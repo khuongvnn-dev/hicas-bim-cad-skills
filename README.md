@@ -6,17 +6,13 @@ Cấu trúc theo chuẩn [anthropics/skills](https://github.com/anthropics/skill
 
 ## Plugin `hicas-bimcad`
 
-Quy trình từ thu thập yêu cầu tới hiện thực hóa:
+Quy trình từ thu thập yêu cầu tới hiện thực hóa. Sau khi dev duyệt ticket, `redmine-us-writer-verified` tự chuyển tiếp:
+1 ticket → `addin-story`, từ 2 ticket (hoặc con của một US) → `addin-batch`.
 
-```
-Redmine ──► redmine-us-writer-verified ──► ticket .md (có Hợp đồng kiểm thử)
-                                               │
-        (dev duyệt → tự chuyển tiếp: 1 ticket → addin-story, nhiều ticket → addin-batch)
-        nhiều ticket ──► addin-batch ──► nhóm theo US ──► 1 worktree / US
-                                               │
-                         addin-story ◄─────────┘  (readiness → design → tasks →
-                                                    test-first → thẩm định độc lập → bàn giao QA)
-```
+![Tổng quan luồng](docs/flow-overview.png)
+
+Chi tiết các phase của `addin-story`: [`docs/flow-story.png`](docs/flow-story.png). Nguồn sơ đồ là file Mermaid
+(`docs/*.mmd`); cách sửa và sinh lại ảnh xem [`docs/README.md`](docs/README.md).
 
 | Skill | Làm gì | Gọi |
 |---|---|---|
@@ -57,8 +53,8 @@ Script [`setup-ag-ide.ps1`](setup-ag-ide.ps1) giúp tự động thiết lập t
    # Trong PowerShell (Windows 10/11):
    .\setup-ag-ide.ps1 -SlnPath "D:\Gits\MyAddin\MyAddin.sln"
 
-   # Hoặc nếu chạy từ Git Bash:
-   ./setup-ag-ide.sh "D:/Gits/MyAddin/MyAddin.sln"
+   # Hoặc từ Git Bash:
+   powershell -ExecutionPolicy Bypass -File ./setup-ag-ide.ps1 -SlnPath "D:/Gits/MyAddin/MyAddin.sln"
    ```
    *Script sẽ tự động kiểm tra công cụ Git và uvx trên máy. Nếu thiếu, script cung cấp menu chọn cài đặt theo cơ chế bitmask (`0`: Bỏ qua, `1`: Cài Git, `2`: Cài uvx, `3`: Cài cả Git + uvx).*
    *Khi phát hiện `mcp_config.json` đã tồn tại, script hỗ trợ 3 tùy chọn: `0`: Giữ nguyên; `1`: Ghi đè mới; `2` (Mặc định): **Ghi đè thông minh** - tự động bổ sung server mới nhưng bảo lưu nguyên vẹn toàn bộ API key, URL và biến môi trường cũ đã điền.*
@@ -86,6 +82,16 @@ Script [`setup-ag-ide.ps1`](setup-ag-ide.ps1) giúp tự động thiết lập t
    Cập nhật bản mới: `/plugin marketplace update hicas-skills`.
    Khi đang sửa skill trên máy, có thể trỏ marketplace vào thư mục clone thay cho GitHub:
    `/plugin marketplace add <đường dẫn clone>`.
+
+## Chi phí token
+
+Luồng được chỉnh để không tốn token vô ích; chỉnh skill thì giữ các nguyên tắc sau:
+- Truyền đường dẫn, không dán nội dung; build/test ghi ra file, chỉ đọc exit code và dòng lỗi.
+- Số lớp kiểm tra theo rủi ro: low dùng evaluator `sonnet`, không có reviewer agent, chấm một lần cả story;
+  medium/high/`[Critical]` dùng `opus`, có reviewer, high chấm từng task.
+- Vòng 2 của evaluator và các lần sửa lỗi gửi tiếp cho agent đang giữ context (`SendMessage`), không spawn lại.
+- `addin-batch` quét project-map đúng một lần trước khi cắt worktree; subagent viết ticket dùng `sonnet`.
+- Writer không in lại cả tài liệu ra chat, chỉ in tóm tắt và đường dẫn.
 
 ## Nhánh và bảo vệ nhánh (addin-batch)
 
@@ -120,4 +126,4 @@ không commit): `tickets/`, `features/<ID>/`, `batch/`, `addin-story.json`, `add
 
 Theo [`spec/agent-skills-spec.md`](spec/agent-skills-spec.md), bắt đầu từ [`template/SKILL.md`](template/SKILL.md),
 thêm đường dẫn vào `skills` của plugin trong [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json),
-rồi chạy `claude plugin validate .`.
+rồi chạy `claude plugin validate .`. Đổi hành vi luồng thì cập nhật sơ đồ trong [`docs/`](docs/README.md) cùng PR.
