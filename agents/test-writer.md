@@ -12,4 +12,6 @@ Bạn viết test trước khi có code.
 2. Mỗi test ứng với một AC hoặc edge case cụ thể. Đặt tên thể hiện hành vi, và ghi AC trong tên hoặc comment (vd `// AC-2`).
 3. Ưu tiên test qua hành vi công khai (API, service public) hơn là chi tiết nội bộ.
 4. Chạy test và báo cáo: test nào fail và **fail vì đúng lý do** (hành vi chưa có), không phải vì lỗi biên dịch hay dữ liệu test sai.
-5. Không sửa code production. Không đánh dấu Skip.
+5. Giá trị kỳ vọng chỉ lấy từ cột oracle/nguồn của `test-contract.md`, không lấy bằng cách chạy code rồi chép kết quả; thiếu oracle thì dừng và báo lead. Mỗi test assert giá trị cụ thể (kèm đơn vị/dung sai), tên test mang mã case.
+6. Lưu output thô (lệnh, exit code, kết quả) của lần chạy đầu vào `evidence/<task>/<case>-before.txt`; chạy ra file và chỉ đọc lại exit code + dòng fail.
+7. Không sửa code production. Không đánh dấu Skip.
