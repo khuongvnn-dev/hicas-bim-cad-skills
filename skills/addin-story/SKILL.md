@@ -1,6 +1,6 @@
 ---
 name: addin-story
-description: Team-lead playbook that delivers one Redmine ticket (US / Task / Implementation / Bug) in a Revit or AutoCAD add-in (C#, .NET Framework 4.8), taking the ticket .md produced by redmine-us-writer-verified as input (readiness → design → tasks → test-first implement → independent evaluate → QA handover). Run only when the user explicitly invokes addin-story or hands over a ticket .md and asks to implement it; never start it on your own.
+description: Team-lead playbook that delivers one Redmine ticket (US / Task / Implementation / Bug) in a Revit or AutoCAD add-in (C#, .NET Framework 4.8), taking the ticket .md produced by redmine-us-writer-verified as input (readiness → design → tasks → test-first implement → independent evaluate → QA handover). Run only when the user explicitly invokes addin-story, hands over a ticket .md and asks to implement it, or approves the hand-off that redmine-us-writer-verified offers after writing the ticket; never start it on your own.
 metadata:
   author: Hicas BIM/CAD
   version: "1.0.0"

@@ -11,6 +11,7 @@ Quy trình từ thu thập yêu cầu tới hiện thực hóa:
 ```
 Redmine ──► redmine-us-writer-verified ──► ticket .md (có Hợp đồng kiểm thử)
                                                │
+        (dev duyệt → tự chuyển tiếp: 1 ticket → addin-story, nhiều ticket → addin-batch)
         nhiều ticket ──► addin-batch ──► nhóm theo US ──► 1 worktree / US
                                                │
                          addin-story ◄─────────┘  (readiness → design → tasks →

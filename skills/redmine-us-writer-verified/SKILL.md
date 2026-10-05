@@ -1,6 +1,6 @@
 ---
 name: redmine-us-writer-verified
-description: Đọc ticket Redmine (Bug/Task/US/Implementation) qua MCP Redmine và viết lại thành tài liệu .md đầy đủ cho dev agent, kèm Hợp đồng kiểm thử độc lập (truy vết R→AC, oracle có nguồn, bằng chứng, người xác nhận). Dùng khi nhắc Redmine, ticket, bug, task, US, implementation cần giao cho dev agent với test chống tự bao che; đầu ra là đầu vào của addin-story.
+description: Đọc ticket Redmine (Bug/Task/US/Implementation) qua MCP Redmine và viết lại thành tài liệu .md đầy đủ cho dev agent, kèm Hợp đồng kiểm thử độc lập (truy vết R→AC, oracle có nguồn, bằng chứng, người xác nhận). Dùng khi nhắc Redmine, ticket, bug, task, US, implementation cần giao cho dev agent với test chống tự bao che; đầu ra là đầu vào của addin-story. Sau khi dev duyệt, tự chuyển tiếp sang addin-story (1 ticket) hoặc addin-batch (nhiều ticket).
 compatibility: Cần MCP server tên redmine (mcp-redmine, có tool redmine_request) (vd từ plugin harness-redmine, hoặc cấu hình mẫu extras/redmine.mcp.json của repo hicas-skills).
 metadata:
   author: Hicas BIM/CAD
@@ -326,8 +326,19 @@ Nếu có điểm không thể đạt vì thiếu thông tin, ghi rõ thay vì l
    - Ghi file UTF-8 (không BOM), giữ nguyên dấu tiếng Việt, vì `lint-story.mjs` của addin-story đọc theo các nhãn tiếng Việt (`- Loại:`, `Hợp đồng kiểm thử`, cột `R`, `Cấp`, `Kết quả đúng`, `Bằng chứng bắt buộc`, `Xác nhận bởi`). Không đổi tên các nhãn/cột này.
 2. **Không in lại toàn bộ tài liệu trong chat** (file đã có trên đĩa; in lại tốn token output gấp đôi mà user mở file là xem được). Chỉ in: tiêu đề, loại, số R, và tóm tắt ≤ 5 dòng.
 3. Thêm một dòng ngắn: những điểm đã hỏi user, số giả định còn lại, **số case cấp A / cấp B / [Critical]**, và đường dẫn file đã lưu. Khi chạy dưới addin-batch (subagent) chỉ trả về đường dẫn file, mã lint và danh sách câu hỏi mở.
-4. Nếu repo là add-in Revit/AutoCAD và skill `addin-story` có sẵn (cùng plugin hicas-bimcad: thư mục `../addin-story/` cạnh skill này): tự chạy lint `node "<thư mục skill addin-story>/scripts/lint-story.mjs" <file.md>`. Exit 1 thì sửa tài liệu theo lỗi rồi lint lại (tối đa 2 lần); exit 0/2 thì báo kết quả. Sau đó đưa lệnh bàn giao để user tự chạy (addin-story không tự gọi được): `/hicas-bimcad:addin-story <đường dẫn file.md>`.
+4. Nếu repo là add-in Revit/AutoCAD và skill `addin-story` có sẵn (cùng plugin hicas-bimcad: thư mục `../addin-story/` cạnh skill này): tự chạy lint `node "<thư mục skill addin-story>/scripts/lint-story.mjs" <file.md>`. Exit 1 thì sửa tài liệu theo lỗi rồi lint lại (tối đa 2 lần); exit 0/2 thì báo kết quả.
 5. Nhiều ticket: mỗi ticket một file .md riêng.
+6. **Chuyển tiếp tự động sau khi dev duyệt.** Chỉ khi repo là add-in Revit/AutoCAD, lint không còn exit 1, và bạn đang chạy
+   **trực tiếp với dev** (không phải subagent do `addin-batch` giao; trường hợp đó chỉ trả đường dẫn, không chuyển tiếp):
+   - Chọn luồng theo số file vừa viết: **1 file → `addin-story`**; **≥ 2 file, hoặc ticket là con của một US còn ticket
+     khác của dev → `addin-batch`**.
+   - Hỏi dev **một lần** (AskUserQuestion): "Duyệt bản ticket để chạy tiếp?" — `Duyệt, chạy <addin-story|addin-batch>` /
+     `Sửa (ghi chú)` / `Dừng ở đây`. Nêu kèm số câu hỏi mở và số case `Chờ người xác nhận` còn lại.
+   - `Duyệt` → gọi ngay bằng công cụ Skill (không bắt dev gõ lại): `hicas-bimcad:addin-story` với args `<đường dẫn file.md>`
+     hoặc `hicas-bimcad:addin-batch` với args `plan <các ID>`. Không truyền `auto`. Câu trả lời "Duyệt" của dev chính là
+     yêu cầu tường minh mà hai skill kia đòi hỏi. `Sửa` → sửa các mục bị ảnh hưởng rồi hỏi lại; `Dừng` → in lệnh để dev tự chạy sau.
+   - Skill kia không có sẵn hoặc gọi lỗi → in lệnh `/hicas-bimcad:addin-story <file.md>` hoặc `/hicas-bimcad:addin-batch plan <ID>`.
+   - `addin-batch` thấy file trong `.harness/tickets/` còn mới (không cũ hơn `updated_on`) thì không viết lại: không tốn token hai lần.
 6. Chỉ ghi ngược lên Redmine khi user yêu cầu rõ; khi đó cho user duyệt bản cuối trước khi đăng. Lưu ý MCP Redmine có thể đang ở chế độ chỉ đọc (`REDMINE_READ_ONLY=1`): nếu lệnh ghi bị từ chối thì báo user và đưa file .md để họ tự dán, không tìm cách vòng qua.
 
 ## Trường hợp đặc biệt
