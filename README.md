@@ -35,7 +35,7 @@ MCP cho test tự động (tuỳ chọn): `b-auto-run` và `qa-test-session` c�
 [HicasTest](https://github.com/longpl-1902/hicas-bimcad-test-tool) cài trên máy có Revit/AutoCAD, với MCP server tên
 `hicas-test`. Cách nhanh nhất: chạy `install.ps1 -RegisterMcp` trong gói HicasTest; hoặc dùng mẫu
 [`extras/hicas-test.mcp.json`](extras/hicas-test.mcp.json). Trong repo add-in, đặt `automationBridge: "hicas-test"`,
-`testBuilds`, `testFixtures` trong `.harness/addin-story.json`. Kết quả của tool chỉ là bằng chứng máy — case cấp B
+`testBuilds`, `testFixtures` (một hoặc nhiều thư mục/file, ổ bất kỳ hoặc ổ mạng; hoặc chỉ định file khi chạy) trong `.harness/addin-story.json`. Kết quả của tool chỉ là bằng chứng máy — case cấp B
 vẫn cần người xác nhận.
 
 ## Cài đặt

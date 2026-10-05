@@ -8,7 +8,7 @@ description: QA asks in plain words to test a feature of a Revit/AutoCAD add-in 
 ## Before starting — ask only what is missing (one message)
 
 1. Host and year (`list_hosts` shows what is ready on this machine).
-2. Test model: a test/golden `.rvt`/`.dwg`. **Never a customer model.**
+2. Test model: a test resource (addin-story Step 0): under a `testFixtures` entry, or a file QA names now (confirm once it is a test model). **Never a customer model**; never search for one. Always opened as a copy.
 3. Build under test: Revit `.addin` manifest, or AutoCAD `.dll` (from the lane/worktree build output).
 4. The scenario: steps in QA's words and what QA wants to see at each step.
 

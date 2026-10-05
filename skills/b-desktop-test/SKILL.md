@@ -22,8 +22,8 @@ until a person confirms it. [Critical] cases always need a person.
 
 1. **Apps:** `request_access` only for the host under test (`Revit` or `AutoCAD` / acad.exe). Never request or
    use a browser, File Explorer, terminal, IDE, mail/chat, Settings, Task Manager, or a second host.
-2. **Data:** only the fixture copy that `qa_session_start` opened. Never File > Open / Save As / Export to another
-   folder, never open recent files, never link or import from outside the fixture folder.
+2. **Data:** only test resources (below), and only the copy that `qa_session_start` opened. Never File > Open /
+   Save As / Export to another folder, never open recent files, never link or import anything else.
 3. **No account, cloud or system actions:** stop and hand over when a sign-in, licence, Autodesk Account, UAC,
    "trust this add-in / always load", Options > security/trusted paths, Add-in Manager install, Collaborate /
    ACC / BIM 360 / Docs, or publish/upload window appears. Never type a password, key or token.
@@ -44,6 +44,8 @@ until a person confirms it. [Critical] cases always need a person.
   expected value + unit + tolerance + **source**, evidence to capture), `test-contract.md`.
 - `.harness/addin-story.json`: `platform`, `deployVersions`, `testBuilds` (year → manifest/dll), `testFixtures`,
   `desktopTest`.
+- **Test resources** — same rule as addin-story Step 0: a file under a `testFixtures` entry (folders/files, any
+  drive or UNC path), or a file the user names for this run after one confirmation. Never anything else.
 - Optional: `F/b-cases/` and `b-auto-run` reports. **Do not read machine reports before running a case** (blind
   first, same rule as for human testers); read them afterwards only to note disagreements.
 
@@ -53,15 +55,17 @@ until a person confirms it. [Critical] cases always need a person.
 - Cases: every B / [Critical] script in `qa-handover.md` with status `Chờ xác nhận`. Skip cases the script marks as
   needing physical judgement you cannot make from the screen (print, plotter, a second screen) — list them.
 - Year: lowest year in `deployVersions` that `list_hosts` reports `ready` and that has a `testBuilds` entry.
-- Fixture: the file named in the script, inside `testFixtures`. Missing or outside `testFixtures` → the case is
-  `chưa chạy được (thiếu fixture)`; never substitute another model.
+- Model: the file the user named for this run, else the file named in the script found under `testFixtures`.
+  Neither → ask the user once for a resource for those cases; no answer → `chưa chạy được (thiếu fixture)`. Never
+  substitute another model, never browse folders to find one.
+- Record each model's source path and SHA-256 (`Get-FileHash -Algorithm SHA256`) for the evidence.
 - Worktrees (addin-batch): one lane at a time, the lane's own build; all cases of a lane in **one** host session.
   Cases touching several lanes and all [Critical] cases run once on the integration build at `finish`.
 
 ### 2. Ask once, then take the desktop
 One message (Vietnamese) and wait for "ok":
 > Claude sẽ điều khiển chuột/bàn phím để chạy N case trên <Revit 2024>, build `<testBuild>`, model copy của
-> `<fixture>`, khoảng <N × 5> phút. Trong lúc chạy đừng dùng máy; muốn dừng thì gõ "dừng" trong Claude Code.
+> `<path>` (với file bạn vừa chỉ định: xác nhận đây là model dùng để test được), khoảng <N × 5> phút. Trong lúc chạy đừng dùng máy; muốn dừng thì gõ "dừng" trong Claude Code.
 > Tắt/thu nhỏ cửa sổ có dữ liệu riêng (mail, chat) vì ảnh chụp màn hình được gửi cho Claude.
 
 Then the **desktop lock** `%LOCALAPPDATA%\HicasTest\desktop.lock` (resolve to the absolute path; Read, then Write):
@@ -70,7 +74,8 @@ Then the **desktop lock** `%LOCALAPPDATA%\HicasTest\desktop.lock` (resolve to th
 
 ### 3. Start the host on a copy
 `qa_session_start(title="<ticket> desktop test", app, version, model=<fixture>, addinManifest|addinAssembly=<testBuild>)`.
-It copies the fixture, loads the build under test, answers the startup security prompt with *Load once* and
+It copies the model into the session folder (also from a network share) — never open the original —, loads the
+build under test, answers the startup security prompt with *Load once* and
 returns a session id. Then `request_access` for that host app only.
 
 ### 4. Run each case

@@ -21,8 +21,10 @@ The case status stays `Chờ xác nhận — có bằng chứng máy`; a human c
 2. For each B case (skip `[Critical]`-only visual checks), write `F/b-cases/<case>.yaml`
    (format: [test-case-format.md](https://github.com/longpl-1902/hicas-bimcad-test-tool/blob/main/docs/test-case-format.md)):
    - `source: qa-handover.md#<case>`; `host.version` = lowest target year.
-   - `model`: the fixture named in the script — must be a test/golden file. Unknown → mark the case
-     `Chưa chạy được (thiếu fixture)` and ask; never pick a customer model.
+   - `model`: a test resource (addin-story Step 0): the file the user named for this run, else the fixture named in
+     the script under a `testFixtures` entry (absolute path when outside the repo). Neither → mark the case
+     `Chưa chạy được (thiếu fixture)` and ask; never pick or search for a model yourself. Note the source path and
+     SHA-256 in `qa-handover.md` next to the report.
    - `run`: from the script's button/command. Revit ribbon button → `CustomCtrl_%CustomCtrl_%<Tab>%<Panel>%<Button>`;
      AutoCAD → command line + prompt answers.
    - `expect`: one entry per value in `Kết quả đúng`, copying the value, unit, tolerance **and its source** verbatim.

@@ -87,7 +87,7 @@ files hasn't changed the facts). Otherwise determine and save:
   "twinProjects": "rule: new .cs → both X.csproj and X_R2022.csproj",
   "automationBridge": "hicas-test (HicasTest: list_hosts, run_test_case, qa_session_*) | e.g. MCP server '<your-addin-mcp>' (list_revit_instances, call_tool) | none",
   "testBuilds": { "2024": "src/X/bin/Debug/R2024/X.addin", "2026": "src/X/bin/Debug/R2026/X.addin" },
-  "testFixtures": "tests/fixtures/ (test/golden .rvt/.dwg only) | none",
+  "testFixtures": ["tests/fixtures/", "D:/TestModels/Hawee/", "\\\\server\\qa\\models\\basic.rvt"] | "none",
   "desktopTest": "computer-use (Claude runs the B/Critical scripts on the desktop, skill b-desktop-test) | none",
   "automationRule": "e.g. MCP-FEAT-001: new capability needs a tool | none",
   "baseBranch": "DEV", "highRiskPaths": ["**/*.csproj", "..."] }
@@ -98,6 +98,14 @@ files hasn't changed the facts). Otherwise determine and save:
 - **Version lock = the lowest deployed host version**, not the compile version. If one DLL ships to several
   host years, APIs newer than `apiFloor` are forbidden.
 - Detect platform from csproj references (`RevitAPI*` → Revit; `AcMgd/AcDbMgd/AcCoreMgd`/AutoCAD.NET → AutoCAD).
+- **Test resources** (models / DWGs any host test may open — b-auto-run, b-desktop-test, qa-test-session):
+  1. a file under a `testFixtures` entry — a string or a list of folders/files, any drive or UNC path; or
+  2. a file the user names in the conversation for this run ("test bằng D:\Models\toa-A.rvt"), after asking once:
+     "Xác nhận `<path>` là model dùng để test được (không phải bản làm việc của khách hàng)?".
+  Never pick a model outside these, never browse folders looking for one. Always open a **copy** (HicasTest copies
+  before opening), never save over or next to the original. Record the source path and SHA-256
+  (`Get-FileHash -Algorithm SHA256`) in the evidence. A script's fixture missing from both → the case is
+  `chưa chạy được (thiếu fixture)`; ask the user for a resource instead of substituting one.
 
 ## Phase 0 — Ingest & route
 1. Obtain the document: a path → copy to `F/source.md`. Only an ID / raw text → ask the user to run
@@ -206,7 +214,7 @@ files. Run every build command from Step 0. Must pass before Phase 4.
 4. **Level-B machine evidence (optional, saves the user time):**
    - `automationBridge` is `hicas-test` → run the `b-auto-run` skill for this story: YAML in `F/b-cases/`,
      evidence in `F/evidence/host/<year>/`, ledger `F/b-auto-ledger.csv`, one run per `deployVersions` year that
-     is installed and has a `testBuilds` entry. The tool opens only `testFixtures`, always on a copy.
+     is installed and has a `testBuilds` entry. The tool opens only test resources (Step 0), always on a copy.
    - Another bridge (an add-in's own MCP) and the user has a **test/golden** model or DWG open → use **read-only**
      tools to dump the values a B case needs into `evidence/T<n>/<case>-host.txt`. WRITE tools only on a test
      model with preview/dry-run and the user's OK.
