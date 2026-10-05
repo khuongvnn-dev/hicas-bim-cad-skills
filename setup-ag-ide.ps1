@@ -460,15 +460,52 @@ if (-not (Test-Path -LiteralPath $AddinStoryJsonPath)) {
     Write-Host "  -> Created template: .harness/addin-story.json" -ForegroundColor DarkGray
 }
 
-# Cấu hình Git exclude để tránh commit thư mục .harness/
+# Cấu hình .gitignore của project để tránh commit .agents/ và .harness/
+Write-Step "Kiem tra va cap nhat .gitignore cua project..."
+$GitIgnorePath = Join-Path $ProjectRoot ".gitignore"
+$ignoreEntries = @(
+    "# Antigravity IDE & AI Workflow",
+    ".agents/",
+    "agents/",
+    ".harness/"
+)
+
+if (Test-Path -LiteralPath $GitIgnorePath) {
+    $existingIgnore = Get-Content -LiteralPath $GitIgnorePath -Raw -ErrorAction SilentlyContinue
+    $missingEntries = @()
+    foreach ($entry in @(".agents/", "agents/", ".harness/")) {
+        if ($existingIgnore -notmatch [regex]::Escape($entry)) {
+            $missingEntries += $entry
+        }
+    }
+    if ($missingEntries.Count -gt 0) {
+        $appendBlock = "`n# Antigravity IDE & AI Workflow`n" + ($missingEntries -join "`n") + "`n"
+        Add-Content -LiteralPath $GitIgnorePath -Value $appendBlock -Encoding UTF8
+        Write-Success "Da them $($missingEntries -join ', ') vao file .gitignore cua project"
+    } else {
+        Write-Host "  -> File .gitignore da bo qua cac thu muc agents/ va .harness/" -ForegroundColor DarkGray
+    }
+} else {
+    $newIgnoreContent = ($ignoreEntries -join "`n") + "`n"
+    Set-Content -LiteralPath $GitIgnorePath -Value $newIgnoreContent -Encoding UTF8
+    Write-Success "Da tao moi file .gitignore voi cac thu muc .agents/, agents/, .harness/"
+}
+
+# Cấu hình thêm vào .git/info/exclude để bảo vệ cục bộ (local exclude)
 $GitDir = Join-Path $ProjectRoot ".git"
 if (Test-Path -LiteralPath $GitDir) {
     $GitExcludePath = Join-Path $GitDir "info\exclude"
     if (Test-Path -LiteralPath $GitExcludePath) {
         $excludeContent = Get-Content -LiteralPath $GitExcludePath -Raw -ErrorAction SilentlyContinue
-        if ($excludeContent -notmatch "\.harness/") {
-            Add-Content -LiteralPath $GitExcludePath -Value "`n.harness/`n" -Encoding UTF8
-            Write-Success "Da them .harness/ vao .git/info/exclude"
+        $toExclude = @()
+        foreach ($e in @(".harness/", ".agents/", "agents/")) {
+            if ($excludeContent -notmatch [regex]::Escape($e)) {
+                $toExclude += $e
+            }
+        }
+        if ($toExclude.Count -gt 0) {
+            Add-Content -LiteralPath $GitExcludePath -Value ("`n" + ($toExclude -join "`n") + "`n") -Encoding UTF8
+            Write-Success "Da them ($($toExclude -join ', ')) vao .git/info/exclude"
         }
     }
 }
